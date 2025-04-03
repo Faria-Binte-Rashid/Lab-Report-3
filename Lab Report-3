@@ -1,0 +1,48 @@
+def is_safe(node, color, graph, colors):
+    """Check if the current color assignment is safe for a given node."""
+    for neighbor in graph[node]:
+        if colors[neighbor] == color:
+            return False
+    return True
+
+def graph_coloring_util(node, graph, colors, k, n):
+    """Recursive function that attempts to color the graph using backtracking."""
+    if node == n:
+        return True  # All nodes are successfully colored
+
+    for color in range(1, k + 1):
+        if is_safe(node, color, graph, colors):
+            colors[node] = color  # Assign the color
+            if graph_coloring_util(node + 1, graph, colors, k, n):
+                return True
+            colors[node] = 0  # Backtrack if assignment leads to failure
+
+    return False
+
+def read_input_from_file(filename):
+    """Reads the graph input from a file."""
+    with open(filename, "r") as file:
+        lines = file.readlines()
+        n, m, k = map(int, lines[0].split())  # Read N, M, K
+        edges = [tuple(map(int, line.split())) for line in lines[1:m+1]]  # Read edges
+    return n, m, k, edges
+
+def graph_coloring(filename):
+    """Main function that reads the graph from file and attempts to find a valid coloring."""
+    n, m, k, edges = read_input_from_file(filename)
+
+    graph = {i: [] for i in range(n)}
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    colors = [0] * n  # Color assignment for each node
+
+    if graph_coloring_util(0, graph, colors, k, n):
+        print(f"Coloring Possible with {k} Colors")
+        print(f"Color Assignment: {colors}")
+    else:
+        print(f"Coloring Not Possible with {k} Colors")
+
+# Run with input file
+graph_coloring("input1.txt")  # Change to "input2.txt" for second test case
